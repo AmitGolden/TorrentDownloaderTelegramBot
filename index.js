@@ -10,9 +10,9 @@ const Markup = require('telegraf/markup');
 const WizardScene = require('telegraf/scenes/wizard');
 const Fs = require('fs');
 const Path = require('path');
-require('dotenv').config();
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+const config = JSON.parse(Fs.readFileSync('./config.json'));
+const bot = new Telegraf(config.botToken);
 const client = new WebTorrent();
 
 client.on('error', (err) => console.log(err));
@@ -122,7 +122,7 @@ const torrentWiz = new WizardScene('torrentWiz',
             return ctx.scene.leave();
         }
 
-        const path = ctx.wizard.state.mediaType === "other" ? process.env.OUTPUT_DIR : `${process.env.OUTPUT_DIR}/${ctx.wizard.state.mediaType}`;
+        const path = ctx.wizard.state.mediaType === "other" ? config.outputDir : `${config.outputDir}/${ctx.wizard.state.mediaType}`;
 
         if (ctx.wizard.state.torrentSource === "magnet")
             addTorrentMagnet(ctx, path);
@@ -183,7 +183,7 @@ const fileWiz = new WizardScene('fileWiz',
             ctx.reply('Abortting.');
             return ctx.scene.leave();
         }
-        const path = ctx.wizard.state.mediaType === "other" ? process.env.OUTPUT_DIR : `${process.env.OUTPUT_DIR}/${ctx.wizard.state.mediaType}`;
+        const path = ctx.wizard.state.mediaType === "other" ? config.outputDir : `${config.outputDir}/${ctx.wizard.state.mediaType}`;
         try {
             const fileId = ctx.message.document.file_id;
             ctx.telegram.getFileLink(fileId)
