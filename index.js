@@ -11,7 +11,7 @@ const WizardScene = require('telegraf/scenes/wizard');
 const Fs = require('fs');
 const Path = require('path');
 
-const config = JSON.parse(Fs.readFileSync('./config.json'));
+const config = JSON.parse(Fs.readFileSync('config.json'));
 const bot = new Telegraf(config.botToken);
 const client = new WebTorrent();
 
@@ -245,6 +245,14 @@ bot.command("file", ctx => {
     if (ctx.scene !== undefined)
         ctx.scene.leave();
     ctx.scene.enter('fileWiz')
+});
+
+process.on('uncaughtException', function (err) {
+    if (err) {
+        const date = new Date().toLocaleString();
+        Fs.appendFileSync(config.logPath, `Error ${date}: ${err.stack}\n`);
+        process.exit(1);
+    }
 });
 
 bot.launch();
